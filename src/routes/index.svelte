@@ -1,19 +1,26 @@
 <script lang="ts">
+import { onMount } from "svelte";
+
     import Predictor from "../utils/predict_ml"
     let gridContent = "---------".split("")
+    
+    let predictor: Predictor
+    let cellClicked
+    onMount(() => {
+        predictor = new Predictor()
 
-    const predictor = new Predictor()
+        cellClicked = async (idx: number) => {
+            console.log(idx)
+            gridContent[idx] = "X"
 
-    const cellClicked = async (idx: number) => {
-        console.log(idx)
-        gridContent[idx] = "X"
-
-        // Make prediction
-        if (!predictor.isReady) await predictor.modelPromise
-        let prediction = await predictor.predict(gridContent)
-        gridContent[prediction] = "O"
-        gridContent = gridContent
-    }
+            // Make prediction
+            if (!predictor.isReady) await predictor.modelPromise
+            let prediction = await predictor.predict(gridContent)
+            gridContent[prediction] = "O"
+            gridContent = gridContent
+        }
+    })
+    
 </script>
 
 <div class="grid">
