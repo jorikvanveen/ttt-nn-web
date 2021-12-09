@@ -36,11 +36,11 @@ import { diag } from "@tensorflow/tfjs";
             if (col[0] == "-" || row[0] == "-") continue
 
             if (isArrayRepetetive(col) && col[0] != "-") { 
-                winner = col[0]
+                winner = col[0] === ai ? 'Computer' : 'You'
             }
 
             if (isArrayRepetetive(row) && row[0] != "-") {
-                winner = row[0]
+                winner = row[0] === ai ? 'Computer' : 'You'
             }
         }
         
@@ -99,48 +99,35 @@ import { diag } from "@tensorflow/tfjs";
 </script>
 
 
-
-{#if currentPlayer && !winner}
-<div class="grid">
-    {#each {length: 3} as _,i}
-        <div class="row">
-            {#each {length: 3} as _,j}
-                <div id="{(i*3+j).toString()}" class="cell" on:click={cellClicked.bind(this, i*3+j)}>
-                    <div class="cellText">
-                        {gridContent[i*3 + j]}
+<div class="container">
+    {#if currentPlayer}
+    <div class="grid">
+        {#each {length: 3} as _,i}
+            <div class="row">
+                {#each {length: 3} as _,j}
+                    <div id="{(i*3+j).toString()}" class="cell" on:click={cellClicked.bind(this, i*3+j)}>
+                        <div class="cellText">
+                            {gridContent[i*3 + j]}
+                        </div>
                     </div>
-                </div>
-            {/each}
-        </div>
-    {/each}
-</div>
-{:else if !currentPlayer}
-<div>
-    <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
-    <button on:click={choosePlayer.bind(this, 'human')}>Human first</button>
-</div>
-{/if}
-
-{#if winner}
-    <p>{winner} wins!</p>
-    <button on:click={() => window.location.reload()}>Restart</button>
-{/if}
-
-    <div class="buttons">
-        {#if !currentPlayer}
-        <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
-        {/if}
-        <div>
-            {#if currentPlayer === ai}
-            <span>Computer's turn</span>
-            {:else if currentPlayer === human}
-            <span>Your turn</span>
-            {:else}
-            <span>Choose first player</span>
-            {/if}
-        </div>
-        {#if !currentPlayer}
-        <button on:click={choosePlayer.bind(this, 'human')}>You first</button>
-        {/if}
+                {/each}
+            </div>
+        {/each}
     </div>
+    {#if currentPlayer === ai && !winner}
+    <span>Computer's turn</span>
+    {:else if currentPlayer === human && !winner}
+    <span>Your turn</span>
+    {:else if winner}
+    <span>{winner} win{#if winner !== 'You'}s{/if}!</span>
+    <button class="btn" on:click={() => window.location.reload()}>Play again</button>
+    {/if}
+
+    {:else if !currentPlayer}
+    <div class="buttons">
+        <span style="display: block;">Choose starting player</span>
+        <button class="btn" on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
+        <button class="btn" on:click={choosePlayer.bind(this, 'human')}>You first</button>
+    </div>
+    {/if}
 </div>
