@@ -29,6 +29,8 @@
 
 .buttons {
     width: 500px;
+    display: flex;
+    flex-direction: row;
 }
 
 .buttons .btn {
@@ -79,9 +81,12 @@ span {
         flex-direction: column;
         width: unset;
         padding: 0;
+        display: flex;
+        width: 98vw;
     }
-    .buttons button {
+    button {
         order: 1;
         margin-top: 20px;
+        height: 5rem;
     }
 }
