@@ -31,20 +31,20 @@ import { onMount } from "svelte";
     }
     const onBoardChange = (board) => {
         // Check if this board is ended
-        console.log("checking", board)
-
         for (let i = 0; i < 3; i++) {
             const col = [gridContent[i], gridContent[3+i], gridContent[6+i]]
             const row = [gridContent[i], gridContent[i*3+1], gridContent[i*3+2]]
 
             if (col[0] == "-" || row[0] == "-") continue
 
-            if (isArrayRepetetive(col) && col[0] != "-") { 
+            if (isArrayRepetetive(col) && col[0] != "-") {
+                console.log(col);
                 winner = col[0]
                 submitData()
             }
 
             if (isArrayRepetetive(row) && row[0] != "-") {
+                console.log(row);
                 winner = row[0]
                 submitData()
             }
@@ -67,24 +67,20 @@ import { onMount } from "svelte";
     onMount(() => {
         predictor = new Predictor()
 
-        cellClicked = async (idx: number) => {
-            console.log(ai, human, currentPlayer);
-            
-            if(currentPlayer === human && gridContent[idx] == '-') {
+        cellClicked = async (idx: number) => {            
+            if(currentPlayer === human && gridContent[idx] == '-' && !winner) {
                 gridContent[idx] = human
                 currentPlayer = ai
                 botMove()
                 moveHistory.push(idx)
+                gridContent = gridContent
             }
-            // Make prediction
-            gridContent = gridContent
         }
     })
 
     async function botMove() {
         if (!predictor.isReady) await predictor.modelPromise
         let prediction = await predictor.predict(gridContent)
-        console.log(prediction);
         
         if(gridContent[prediction] == '-') {    
             gridContent[prediction] = ai
@@ -128,7 +124,15 @@ import { onMount } from "svelte";
     {:else if currentPlayer === human && !winner}
     <span>Your turn</span>
     {:else if winner}
-    <span>{winner} win{#if winner !== 'You'}s{/if}!</span>
+    <span>
+    {#if winner === ai}
+    Computer wins!
+    {:else if winner === human}
+    You win!
+    {:else}
+    No one wins
+    {/if}
+    </span>
     <button class="btn" on:click={() => window.location.reload()}>Play again</button>
     {/if}
 
