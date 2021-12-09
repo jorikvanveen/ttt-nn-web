@@ -4,6 +4,12 @@ import { MongoClient } from "mongodb"
 dotenv.config()
 
 const MONGO_URI: string = process.env.MONGO_URI
+
+if (!MONGO_URI) {
+    console.error("NO MONGO_URI SPECIFIED, please set the MONGO_URI environment variable")
+    process.exit()
+}
+
 const client_obj = new MongoClient(MONGO_URI)
 
 let connected = false
@@ -14,10 +20,6 @@ const conn_prom = client_obj.connect()
         process.exit()
     })
 
-if (!MONGO_URI) {
-    console.error("NO MONGO_URI SPECIFIED, please set the MONGO_URI environment variable")
-    process.exit()
-}
 export async function post(request: ServerRequest) {
     const data = JSON.parse(request.body as string) as {
         timestamp: Date;
