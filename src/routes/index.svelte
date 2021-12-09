@@ -10,7 +10,7 @@ import { onMount } from "svelte";
     let cellClicked
     let ai
     let human
-    let currentPlayer
+    let currentPlayer = null
 
     onMount(() => {
         predictor = new Predictor()
@@ -51,59 +51,40 @@ import { onMount } from "svelte";
             currentPlayer=human
         }
     }
-    
+
 </script>
-
-<div class="grid">
-    {#each {length: 3} as _,i}
-        <div class="row">
-            {#each {length: 3} as _,j}
-                <div id="{(i*3+j).toString()}" class="cell" on:click={cellClicked.bind(this, i*3+j)}>
-                    <div class="cellText">
-                        {gridContent[i*3 + j]}
+<div class="container">
+    {#if currentPlayer}
+    <div class="grid">
+        {#each {length: 3} as _,i}
+            <div class="row">
+                {#each {length: 3} as _,j}
+                    <div id="{(i*3+j).toString()}" class="cell" on:click={cellClicked.bind(this, i*3+j)}>
+                        <div class="cellText">
+                            {gridContent[i*3 + j]}
+                        </div>
                     </div>
-                </div>
-            {/each}
+                {/each}
+            </div>
+        {/each}
+    </div>
+    {/if}
+
+    <div class="buttons">
+        {#if !currentPlayer}
+        <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
+        {/if}
+        <div>
+            {#if currentPlayer === ai}
+            <span>Computer's turn</span>
+            {:else if currentPlayer === human}
+            <span>Your turn</span>
+            {:else}
+            <span>Choose first player</span>
+            {/if}
         </div>
-    {/each}
+        {#if !currentPlayer}
+        <button on:click={choosePlayer.bind(this, 'human')}>You first</button>
+        {/if}
+    </div>
 </div>
-
-<div>
-    <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
-    <button on:click={choosePlayer.bind(this, 'human')}>Human first</button>
-</div>
-
-<style>
-    .grid {
-        border: solid 3px black;
-        width: 500px;
-        height: 500px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .row {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-    }
-
-    .cell {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-around;
-        border-right: 1px solid black;
-        border-top: 1px solid black;
-    }
-    
-    .cellText {
-        width: 0;
-        height: 0;
-        margin-bottom: 20px;
-        font-size: 1.5rem;
-        font-family: sans-serif;
-        text-align: center;
-    }
-</style>
