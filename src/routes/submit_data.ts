@@ -15,8 +15,9 @@ const client_obj = new MongoClient(MONGO_URI)
 let connected = false
 const conn_prom = client_obj.connect()
     .then(() => connected = true)
-    .catch(() => {
+    .catch((err) => {
         console.error("Failed to connectt to db")
+        console.error(err)
         process.exit()
     })
 
