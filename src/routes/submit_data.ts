@@ -10,6 +10,8 @@ if (!MONGO_URI) {
     process.exit()
 }
 
+console.log(MONGO_URI)
+
 const client_obj = new MongoClient(MONGO_URI)
 
 let connected = false
