@@ -30,7 +30,7 @@
 .buttons {
     width: 500px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 }
 
 .buttons .btn {
@@ -64,8 +64,9 @@ span {
 .cellText {
     width: 0;
     height: 0;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    margin-bottom: 4rem;
+    margin-right: 2rem;
+    font-size: 4rem;
     font-family: sans-serif;
     text-align: center;
 }

@@ -32,7 +32,7 @@ import { onMount } from "svelte";
         // Check if this board is ended
         for (let i = 0; i < 3; i++) {
             const col = [gridContent[i], gridContent[3+i], gridContent[6+i]]
-            const row = [gridContent[i], gridContent[i*3+1], gridContent[i*3+2]]
+            const row = [gridContent[i*3], gridContent[i*3+1], gridContent[i*3+2]]
 
             if (col[0] == "-" || row[0] == "-") continue
 
@@ -111,7 +111,7 @@ import { onMount } from "svelte";
                 {#each {length: 3} as _,j}
                     <div id="{(i*3+j).toString()}" class="cell" on:click={cellClicked.bind(this, i*3+j)}>
                         <div class="cellText">
-                            {gridContent[i*3 + j]}
+                            {gridContent[i*3 + j] != "-" ? gridContent[i*3 + j] : ""}
                         </div>
                     </div>
                 {/each}
