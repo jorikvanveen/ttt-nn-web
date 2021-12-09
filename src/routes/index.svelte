@@ -3,27 +3,31 @@ import { onMount } from "svelte";
 
     import Predictor from "../utils/predict_ml"
     import isArrayRepetetive from "../utils/is_array_repetetive"
-import { diag } from "@tensorflow/tfjs";
     let gridContent = "---------".split("")
     
     let predictor: Predictor 
     let currentPlayer: string | null = null
     let cellClicked: (idx: number) => void
     let ai: string = "O"
+    let moveHistory: number[] = []
+    
 
     let winner: string | null = null
 
 
     $: human = ai == "X" ? "O" : "X"
 
-    const possibleMoves = () => {
-        let moveCount = 0
-
-        for (const cell in gridContent) {
-            if (cell == "-") moveCount++
-        }
-
-        return moveCount
+    const submitData = () => {
+        console.log("Sending data")
+        fetch("./submit_data", {
+            method: "POST",
+            body: JSON.stringify({
+                timestamp: new Date(),
+                first_move_player: human,
+                winner,
+                moves: moveHistory
+            })
+        })
     }
     const onBoardChange = (board) => {
         // Check if this board is ended
@@ -36,11 +40,13 @@ import { diag } from "@tensorflow/tfjs";
             if (col[0] == "-" || row[0] == "-") continue
 
             if (isArrayRepetetive(col) && col[0] != "-") { 
-                winner = col[0] === ai ? 'Computer' : 'You'
+                winner = col[0]
+                submitData()
             }
 
             if (isArrayRepetetive(row) && row[0] != "-") {
-                winner = row[0] === ai ? 'Computer' : 'You'
+                winner = row[0]
+                submitData()
             }
         }
         
@@ -52,6 +58,7 @@ import { diag } from "@tensorflow/tfjs";
 
         if (!winner && gridContent.reduce((a, b) => b == "-" ? a + 1 : a, 0) == 0) {
             winner = "No one"
+            submitData()
         }
     }
 
@@ -67,6 +74,7 @@ import { diag } from "@tensorflow/tfjs";
                 gridContent[idx] = human
                 currentPlayer = ai
                 botMove()
+                moveHistory.push(idx)
             }
             // Make prediction
             gridContent = gridContent
@@ -81,6 +89,7 @@ import { diag } from "@tensorflow/tfjs";
         if(gridContent[prediction] == '-') {    
             gridContent[prediction] = ai
             currentPlayer = human
+            moveHistory.push(prediction)
         }
     }
 
