@@ -1,16 +1,61 @@
 <script lang="ts">
-import { log } from "@tensorflow/tfjs";
-
 import { onMount } from "svelte";
 
     import Predictor from "../utils/predict_ml"
+    import isArrayRepetetive from "../utils/is_array_repetetive"
+import { diag } from "@tensorflow/tfjs";
     let gridContent = "---------".split("")
     
     let predictor: Predictor
-    let cellClicked
-    let ai
-    let human
-    let currentPlayer
+    let cellClicked: (idx: number) => void
+    let ai: string = "O"
+    let currentPlayer: string
+
+    let winner: string | null = null
+
+
+    $: human = ai == "X" ? "O" : "X"
+
+    const possibleMoves = () => {
+        let moveCount = 0
+
+        for (const cell in gridContent) {
+            if (cell == "-") moveCount++
+        }
+
+        return moveCount
+    }
+    const onBoardChange = (board) => {
+        // Check if this board is ended
+        console.log("checking", board)
+
+        for (let i = 0; i < 3; i++) {
+            const col = [gridContent[i], gridContent[3+i], gridContent[6+i]]
+            const row = [gridContent[i], gridContent[i*3+1], gridContent[i*3+2]]
+
+            if (col[0] == "-" || row[0] == "-") continue
+
+            if (isArrayRepetetive(col) && col[0] != "-") { 
+                winner = col[0]
+            }
+
+            if (isArrayRepetetive(row) && row[0] != "-") {
+                winner = row[0]
+            }
+        }
+        
+        const diag_1 = [gridContent[0], gridContent[4], gridContent[8]]
+        const diag_2 = [gridContent[2], gridContent[4], gridContent[6]]
+
+        if (isArrayRepetetive(diag_1) && diag_1[0] != "-") winner = diag_1[0]
+        if (isArrayRepetetive(diag_2) && diag_2[0] != "-") winner = diag_2[0]
+
+        if (!winner && gridContent.reduce((a, b) => b == "-" ? a + 1 : a, 0) == 0) {
+            winner = "No one"
+        }
+    }
+
+    $: onBoardChange(gridContent)
 
     onMount(() => {
         predictor = new Predictor()
@@ -30,30 +75,29 @@ import { onMount } from "svelte";
 
     async function botMove() {
         if (!predictor.isReady) await predictor.modelPromise
-            let prediction = await predictor.predict(gridContent)
-            console.log(prediction);
-            
-            if(gridContent[prediction] == '-') {    
-                gridContent[prediction] = ai
-                currentPlayer = human
-            }
+        let prediction = await predictor.predict(gridContent)
+        console.log(prediction);
+        
+        if(gridContent[prediction] == '-') {    
+            gridContent[prediction] = ai
+            currentPlayer = human
+        }
     }
 
-    function choosePlayer(player) {
+    function choosePlayer(player: string) {
         if(player === 'ai') {
             ai='X';
-            human='O';
             currentPlayer=ai
             botMove()
         } else if (player === 'human') {
             ai='O';
-            human='X';
             currentPlayer=human
         }
     }
-    
 </script>
 
+
+{#if currentPlayer && !winner}
 <div class="grid">
     {#each {length: 3} as _,i}
         <div class="row">
@@ -67,11 +111,18 @@ import { onMount } from "svelte";
         </div>
     {/each}
 </div>
-
+{:else if !currentPlayer}
 <div>
     <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
     <button on:click={choosePlayer.bind(this, 'human')}>Human first</button>
 </div>
+{/if}
+
+{#if winner}
+    <p>{winner} wins!</p>
+    <button on:click={() => window.location.reload()}>Restart</button>
+{/if}
+
 
 <style>
     .grid {
