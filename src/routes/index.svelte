@@ -5,12 +5,13 @@ import { onMount } from "svelte";
     import isArrayRepetetive from "../utils/is_array_repetetive"
     let gridContent = "---------".split("")
     
-    let predictor: Predictor
+    let predictor: Predictor 
+    let currentPlayer: string | null = null
     let cellClicked: (idx: number) => void
     let ai: string = "O"
-    let currentPlayer: string
     let moveHistory: number[] = []
     
+
     let winner: string | null = null
 
 
@@ -102,7 +103,10 @@ import { onMount } from "svelte";
             currentPlayer=human
         }
     }
+
+
 </script>
+
 
 
 {#if currentPlayer && !winner}
@@ -119,11 +123,6 @@ import { onMount } from "svelte";
         </div>
     {/each}
 </div>
-{:else if !currentPlayer}
-<div>
-    <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
-    <button on:click={choosePlayer.bind(this, 'human')}>Human first</button>
-</div>
 {/if}
 
 {#if winner}
@@ -131,38 +130,22 @@ import { onMount } from "svelte";
     <button on:click={() => window.location.reload()}>Restart</button>
 {/if}
 
-
-<style>
-    .grid {
-        border: solid 3px black;
-        width: 500px;
-        height: 500px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .row {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-    }
-
-    .cell {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-around;
-        border-right: 1px solid black;
-        border-top: 1px solid black;
-    }
-    
-    .cellText {
-        width: 0;
-        height: 0;
-        margin-bottom: 20px;
-        font-size: 1.5rem;
-        font-family: sans-serif;
-        text-align: center;
-    }
-</style>
+{#if !winner}
+<div class="buttons">
+    {#if !currentPlayer}
+    <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
+    {/if}
+    <div>
+        {#if currentPlayer === ai}
+        <span>Computer's turn</span>
+        {:else if currentPlayer === human}
+        <span>Your turn</span>
+        {:else}
+        <span>Choose first player</span>
+        {/if}
+    </div>
+    {#if !currentPlayer}
+    <button on:click={choosePlayer.bind(this, 'human')}>You first</button>
+    {/if}
+</div>
+{/if}
