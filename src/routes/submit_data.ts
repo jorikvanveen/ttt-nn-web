@@ -36,7 +36,7 @@ export async function post(request: ServerRequest) {
     if (
         datakeys.length != 4 ||
         !datakeys.includes("timestamp") ||
-        !datakeys.includes("first_move_player") ||
+        !datakeys.includes("first_move_was_human") ||
         !datakeys.includes("winner") ||
         !datakeys.includes("moves")
     ) return {
