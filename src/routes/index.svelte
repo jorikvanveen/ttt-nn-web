@@ -22,7 +22,7 @@ import { onMount } from "svelte";
             method: "POST",
             body: JSON.stringify({
                 timestamp: new Date(),
-                first_move_player: human,
+                first_move_was_human: human === "X",
                 winner,
                 moves: moveHistory
             })

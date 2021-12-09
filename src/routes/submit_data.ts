@@ -26,7 +26,7 @@ const conn_prom = client_obj.connect()
 export async function post(request: ServerRequest) {
     const data = JSON.parse(request.body as string) as {
         timestamp: Date;
-        first_move_player: string;
+        first_move_was_human: boolean;
         winner: string;
         moves: number[];
     }
