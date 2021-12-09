@@ -1,4 +1,6 @@
 <script lang="ts">
+import { log } from "@tensorflow/tfjs";
+
 import { onMount } from "svelte";
 
     import Predictor from "../utils/predict_ml"
@@ -6,20 +8,49 @@ import { onMount } from "svelte";
     
     let predictor: Predictor
     let cellClicked
+    let ai
+    let human
+    let currentPlayer
+
     onMount(() => {
         predictor = new Predictor()
 
         cellClicked = async (idx: number) => {
-            console.log(idx)
-            gridContent[idx] = "X"
-
+            console.log(ai, human, currentPlayer);
+            
+            if(currentPlayer === human && gridContent[idx] == '-') {
+                gridContent[idx] = human
+                currentPlayer = ai
+                botMove()
+            }
             // Make prediction
-            if (!predictor.isReady) await predictor.modelPromise
-            let prediction = await predictor.predict(gridContent)
-            gridContent[prediction] = "O"
             gridContent = gridContent
         }
     })
+
+    async function botMove() {
+        if (!predictor.isReady) await predictor.modelPromise
+            let prediction = await predictor.predict(gridContent)
+            console.log(prediction);
+            
+            if(gridContent[prediction] == '-') {    
+                gridContent[prediction] = ai
+                currentPlayer = human
+            }
+    }
+
+    function choosePlayer(player) {
+        if(player === 'ai') {
+            ai='X';
+            human='O';
+            currentPlayer=ai
+            botMove()
+        } else if (player === 'human') {
+            ai='O';
+            human='X';
+            currentPlayer=human
+        }
+    }
     
 </script>
 
@@ -35,6 +66,11 @@ import { onMount } from "svelte";
             {/each}
         </div>
     {/each}
+</div>
+
+<div>
+    <button on:click={choosePlayer.bind(this, 'ai')}>Computer first</button>
+    <button on:click={choosePlayer.bind(this, 'human')}>Human first</button>
 </div>
 
 <style>
