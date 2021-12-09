@@ -14,7 +14,6 @@ import { onMount } from "svelte";
 
     let winner: string | null = null
 
-
     $: human = ai == "X" ? "O" : "X"
 
     const submitData = () => {
