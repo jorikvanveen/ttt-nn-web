@@ -10,8 +10,6 @@ import { onMount } from "svelte";
     let cellClicked: (idx: number) => void
     let ai: string = "O"
     let moveHistory: number[] = []
-    
-
     let winner: string | null = null
 
     $: human = ai == "X" ? "O" : "X"
@@ -31,33 +29,37 @@ import { onMount } from "svelte";
     const onBoardChange = (board) => {
         // Check if this board is ended
         for (let i = 0; i < 3; i++) {
-            const col = [gridContent[i], gridContent[3+i], gridContent[6+i]]
-            const row = [gridContent[i*3], gridContent[i*3+1], gridContent[i*3+2]]
+            const states = [[0,1,2],
+                            [3,4,5],
+                            [6,7,8],
+                            [0,3,6],
+                            [1,4,7],
+                            [2,5,8],
+                            [0,4,8],
+                            [2,4,6]]
 
-            if (col[0] == "-" || row[0] == "-") continue
-
-            if (isArrayRepetetive(col) && col[0] != "-") {
-                console.log(col);
-                winner = col[0]
+            for(const state of states) {
+                let x = 0
+                let o = 0
+                for (const ind of state) {
+                    if(gridContent[ind] === 'X') {
+                        x+=1
+                    } else if (gridContent[ind] === 'O') {
+                        o+=1
+                    }
+                }
+                if (x === 3 && !winner) {
+                    winner = 'X'
+                    submitData()
+                } else if (o === 3 && !winner) {
+                    winner = 'O'
+                    submitData()
+                }
+            }
+            if (!winner && gridContent.reduce((a, b) => b == "-" ? a + 1 : a, 0) == 0) {
+                winner = "No one"
                 submitData()
             }
-
-            if (isArrayRepetetive(row) && row[0] != "-") {
-                console.log(row);
-                winner = row[0]
-                submitData()
-            }
-        }
-        
-        const diag_1 = [gridContent[0], gridContent[4], gridContent[8]]
-        const diag_2 = [gridContent[2], gridContent[4], gridContent[6]]
-
-        if (isArrayRepetetive(diag_1) && diag_1[0] != "-") winner = diag_1[0]
-        if (isArrayRepetetive(diag_2) && diag_2[0] != "-") winner = diag_2[0]
-
-        if (!winner && gridContent.reduce((a, b) => b == "-" ? a + 1 : a, 0) == 0) {
-            winner = "No one"
-            submitData()
         }
     }
 
